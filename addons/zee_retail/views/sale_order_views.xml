@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.zee_retail</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_zee_register_deposit"
+                        string="Register Deposit"
+                        type="object"
+                        groups="account.group_account_invoice"
+                        invisible="not zee_is_reservation or state == 'cancel'"/>
+            </header>
+            <group name="order_details" position="inside">
+                <field name="zee_is_reservation" readonly="state in ('sale', 'cancel')"/>
+                <field name="zee_deposit_amount"
+                       invisible="not zee_is_reservation"
+                       readonly="state == 'cancel'"/>
+                <field name="zee_deposit_paid" invisible="not zee_is_reservation"/>
+                <field name="zee_balance_due" invisible="not zee_is_reservation"/>
+            </group>
+        </field>
+    </record>
+
+    <record id="view_sales_order_filter" model="ir.ui.view">
+        <field name="name">sale.order.search.inherit.zee_retail</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <filter name="my_sale_orders_filter" position="after">
+                <filter string="Reservations" name="zee_reservations"
+                        domain="[('zee_is_reservation', '=', True)]"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="sale_order_action_reservations" model="ir.actions.act_window">
+        <field name="name">Reservations</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="domain">[('zee_is_reservation', '=', True)]</field>
+        <field name="context">{'default_zee_is_reservation': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first reservation
+            </p>
+            <p>
+                A reservation keeps the items for a customer who pays a deposit.
+                Confirm it to reserve the stock, then register the deposit.
+            </p>
+        </field>
+    </record>
+</odoo>

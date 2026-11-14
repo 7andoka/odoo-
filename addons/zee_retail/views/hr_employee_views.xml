@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.zee_retail</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <page name="hr_settings" position="after">
+                <page name="zee_seller" string="Seller" groups="sales_team.group_sale_manager,hr.group_hr_user">
+                    <group>
+                        <group name="zee_seller_settings">
+                            <field name="zee_is_seller"/>
+                            <field name="zee_seller_code" invisible="not zee_is_seller"/>
+                            <field name="zee_is_branch_manager" invisible="not zee_is_seller"/>
+                            <field name="zee_join_date" invisible="not zee_is_seller"/>
+                            <field name="zee_commission_rate" invisible="not zee_is_seller"/>
+                            <field name="zee_monthly_target" invisible="not zee_is_seller"/>
+                        </group>
+                        <group name="zee_seller_stats" string="This Month" invisible="not zee_is_seller">
+                            <field name="zee_month_sales"/>
+                            <field name="zee_target_achievement"/>
+                            <field name="zee_remaining_target"/>
+                            <field name="zee_estimated_commission"/>
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="hr_employee_view_list_zee_seller" model="ir.ui.view">
+        <field name="name">hr.employee.list.zee_seller</field>
+        <field name="model">hr.employee</field>
+        <field name="arch" type="xml">
+            <list string="Sellers">
+                <field name="name"/>
+                <field name="zee_seller_code"/>
+                <field name="zee_is_branch_manager" optional="hide"/>
+                <field name="zee_monthly_target"/>
+                <field name="zee_month_sales"/>
+                <field name="zee_target_achievement"/>
+                <field name="zee_remaining_target" optional="hide"/>
+                <field name="zee_commission_rate" optional="hide"/>
+                <field name="zee_estimated_commission"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_action_sellers" model="ir.actions.act_window">
+        <field name="name">Sellers</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_ids" eval="[
+            Command.clear(),
+            Command.create({'view_mode': 'list', 'view_id': ref('hr_employee_view_list_zee_seller')}),
+            Command.create({'view_mode': 'form', 'view_id': ref('hr.view_employee_form')}),
+        ]"/>
+        <field name="domain">[('zee_is_seller', '=', True)]</field>
+        <field name="context">{'default_zee_is_seller': True}</field>
+    </record>
+</odoo>

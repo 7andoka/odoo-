@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="zee_reservation_deposit_view_form" model="ir.ui.view">
+        <field name="name">zee.reservation.deposit.view.form</field>
+        <field name="model">zee.reservation.deposit</field>
+        <field name="arch" type="xml">
+            <form string="Register Deposit">
+                <group>
+                    <field name="order_id"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="journal_id"/>
+                    <field name="amount"/>
+                    <field name="payment_date"/>
+                    <field name="memo"/>
+                </group>
+                <footer>
+                    <button name="action_register_deposit" string="Register" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

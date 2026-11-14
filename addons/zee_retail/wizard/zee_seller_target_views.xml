@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="zee_seller_target_view_form" model="ir.ui.view">
+        <field name="name">zee.seller.target.view.form</field>
+        <field name="model">zee.seller.target</field>
+        <field name="arch" type="xml">
+            <form string="Distribute Target">
+                <group>
+                    <field name="month"/>
+                    <field name="total_target"/>
+                    <field name="method"/>
+                    <field name="seller_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="action_distribute" string="Distribute" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="zee_seller_target_action" model="ir.actions.act_window">
+        <field name="name">Distribute Targets</field>
+        <field name="res_model">zee.seller.target</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

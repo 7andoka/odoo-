@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Return vouchers: eWallet cards, issued from a credit note or a Point of Sale return -->
+    <record id="loyalty_program_return_voucher" model="loyalty.program">
+        <field name="name">Return Vouchers</field>
+        <field name="program_type">ewallet</field>
+        <field name="trigger">auto</field>
+        <field name="applies_on">future</field>
+    </record>
+
+    <!-- Promotions, archived by default: open Sales > Products > Discount & Loyalty to enable them.
+         The amounts are in the currency of the company. -->
+    <record id="loyalty_program_buy_two_cheapest_free" model="loyalty.program">
+        <field name="name">Buy 2, the cheapest is free</field>
+        <field name="program_type">promotion</field>
+        <field name="trigger">auto</field>
+        <field name="applies_on">current</field>
+        <field name="active" eval="False"/>
+        <field name="rule_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_point_mode': 'order',
+                'reward_point_amount': 1,
+                'minimum_qty': 2,
+                'minimum_amount': 0,
+            }),
+        ]"/>
+        <field name="reward_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_type': 'discount',
+                'discount_mode': 'percent',
+                'discount': 100,
+                'discount_applicability': 'cheapest',
+                'required_points': 1,
+                'description': 'Cheapest item free',
+            }),
+        ]"/>
+    </record>
+
+    <record id="loyalty_program_three_items_discount" model="loyalty.program">
+        <field name="name">20% off from 3 items</field>
+        <field name="program_type">promotion</field>
+        <field name="trigger">auto</field>
+        <field name="applies_on">current</field>
+        <field name="active" eval="False"/>
+        <field name="rule_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_point_mode': 'order',
+                'reward_point_amount': 1,
+                'minimum_qty': 3,
+                'minimum_amount': 0,
+            }),
+        ]"/>
+        <field name="reward_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_type': 'discount',
+                'discount_mode': 'percent',
+                'discount': 20,
+                'discount_applicability': 'order',
+                'required_points': 1,
+                'description': '20% off the order',
+            }),
+        ]"/>
+    </record>
+
+    <record id="loyalty_program_cart_percent_discount" model="loyalty.program">
+        <field name="name">15% off orders from 2000</field>
+        <field name="program_type">promotion</field>
+        <field name="trigger">auto</field>
+        <field name="applies_on">current</field>
+        <field name="active" eval="False"/>
+        <field name="rule_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_point_mode': 'order',
+                'reward_point_amount': 1,
+                'minimum_qty': 0,
+                'minimum_amount': 2000,
+            }),
+        ]"/>
+        <field name="reward_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_type': 'discount',
+                'discount_mode': 'percent',
+                'discount': 15,
+                'discount_applicability': 'order',
+                'required_points': 1,
+                'description': '15% off the order',
+            }),
+        ]"/>
+    </record>
+
+    <record id="loyalty_program_cart_fixed_discount" model="loyalty.program">
+        <field name="name">300 off orders from 3000</field>
+        <field name="program_type">promotion</field>
+        <field name="trigger">auto</field>
+        <field name="applies_on">current</field>
+        <field name="active" eval="False"/>
+        <field name="rule_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_point_mode': 'order',
+                'reward_point_amount': 1,
+                'minimum_qty': 0,
+                'minimum_amount': 3000,
+            }),
+        ]"/>
+        <field name="reward_ids" eval="[
+            Command.clear(),
+            Command.create({
+                'reward_type': 'discount',
+                'discount_mode': 'per_order',
+                'discount': 300,
+                'discount_applicability': 'order',
+                'required_points': 1,
+                'description': '300 off the order',
+            }),
+        ]"/>
+    </record>
+</odoo>

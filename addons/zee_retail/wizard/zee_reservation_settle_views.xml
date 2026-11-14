@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="zee_reservation_settle_view_form" model="ir.ui.view">
+        <field name="name">zee.reservation.settle.form</field>
+        <field name="model">zee.reservation.settle</field>
+        <field name="arch" type="xml">
+            <form string="Settle Reservation">
+                <group>
+                    <field name="order_id" readonly="1"/>
+                    <field name="deposit_paid" readonly="1"/>
+                    <field name="balance_amount"/>
+                    <field name="journal_id" invisible="balance_amount == 0"
+                        required="balance_amount &gt; 0"/>
+                    <field name="payment_date"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_settle" type="object" string="Settle and Deliver" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="zee_reservation_settle_action" model="ir.actions.act_window">
+        <field name="name">Settle Reservation</field>
+        <field name="res_model">zee.reservation.settle</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_order_id': active_id}</field>
+    </record>
+</odoo>

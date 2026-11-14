@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="zee_branch_transfer_view_list" model="ir.ui.view">
+        <field name="name">zee.branch.transfer.list</field>
+        <field name="model">zee.branch.transfer</field>
+        <field name="arch" type="xml">
+            <list string="Branch Transfers">
+                <field name="name"/>
+                <field name="source_warehouse_id"/>
+                <field name="dest_warehouse_id"/>
+                <field name="total_quantity" sum="Total"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="zee_branch_transfer_view_form" model="ir.ui.view">
+        <field name="name">zee.branch.transfer.form</field>
+        <field name="model">zee.branch.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Branch Transfer">
+                <header>
+                    <button name="action_dispatch" type="object" string="Send from Branch"
+                        class="btn-primary" invisible="state != 'requested'"/>
+                    <button name="action_receive" type="object" string="Receive at Branch"
+                        class="btn-primary" invisible="state != 'dispatched'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                        invisible="state != 'requested'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="requested,dispatched,received"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="source_warehouse_id"/>
+                            <field name="dest_warehouse_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="has_negative_stock" invisible="1"/>
+                            <field name="dispatched_by_id" invisible="state == 'requested'"/>
+                            <field name="dispatched_at" invisible="state == 'requested'"/>
+                            <field name="received_by_id" invisible="state != 'received'"/>
+                            <field name="received_at" invisible="state != 'received'"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert" invisible="not has_negative_stock or state != 'requested'">
+                        Some products exceed the stock available at the sending branch.
+                    </div>
+                    <notebook>
+                        <page string="Products" name="products">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="available_quantity" readonly="1"/>
+                                    <field name="is_negative" column_invisible="1"/>
+                                    <field name="received_quantity" readonly="state != 'dispatched'"/>
+                                    <field name="uom_id" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="zee_branch_transfer_action" model="ir.actions.act_window">
+        <field name="name">Branch Transfers</field>
+        <field name="res_model">zee.branch.transfer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="zee_menu_branch_transfer"
+        name="Branch Transfers"
+        parent="stock.menu_stock_warehouse_mgmt"
+        action="zee_branch_transfer_action"
+        sequence="2"/>
+</odoo>

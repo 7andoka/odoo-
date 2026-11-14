@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stock audit -->
+    <record id="zee_stock_audit_view_list" model="ir.ui.view">
+        <field name="name">zee.stock.audit.list</field>
+        <field name="model">zee.stock.audit</field>
+        <field name="arch" type="xml">
+            <list string="Stock Audits">
+                <field name="name"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="zee_stock_audit_view_form" model="ir.ui.view">
+        <field name="name">zee.stock.audit.form</field>
+        <field name="model">zee.stock.audit</field>
+        <field name="arch" type="xml">
+            <form string="Stock Audit">
+                <header>
+                    <button name="action_start" type="object" string="Start Count" class="btn-primary"
+                        invisible="state != 'draft'"/>
+                    <button name="action_apply" type="object" string="Apply to Stock" class="btn-primary"
+                        invisible="state != 'counting'" groups="stock.group_stock_manager"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                        invisible="state not in ('draft', 'counting')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,counting,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="user_id"/>
+                            <field name="date"/>
+                            <field name="difference_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products" name="products">
+                            <field name="line_ids" readonly="state not in ('counting',)">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="uom_id" readonly="1"/>
+                                    <field name="expected_quantity"/>
+                                    <field name="counted_quantity"/>
+                                    <field name="counted" column_invisible="1"/>
+                                    <field name="difference_quantity" decoration-danger="difference_quantity &lt; 0"
+                                        decoration-success="difference_quantity &gt; 0"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="zee_stock_audit_action" model="ir.actions.act_window">
+        <field name="name">Stock Audits</field>
+        <field name="res_model">zee.stock.audit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="zee_menu_stock_audit"
+        name="Stock Audits"
+        parent="stock.menu_stock_warehouse_mgmt"
+        action="zee_stock_audit_action"
+        sequence="5"/>
+
+    <!-- Daily closing -->
+    <record id="zee_daily_closing_view_list" model="ir.ui.view">
+        <field name="name">zee.daily.closing.list</field>
+        <field name="model">zee.daily.closing</field>
+        <field name="arch" type="xml">
+            <list string="Daily Closings">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="total_system" sum="Total System"/>
+                <field name="total_counted" sum="Total Counted"/>
+                <field name="total_difference" sum="Total Difference"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="zee_daily_closing_view_form" model="ir.ui.view">
+        <field name="name">zee.daily.closing.form</field>
+        <field name="model">zee.daily.closing</field>
+        <field name="arch" type="xml">
+            <form string="Daily Closing">
+                <header>
+                    <button name="action_compute" type="object" string="Compute Totals"
+                        invisible="state != 'draft'"/>
+                    <button name="action_close" type="object" string="Close the Day" class="btn-primary"
+                        invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="session_ids" widget="many2many_tags" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payment Methods" name="methods">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="payment_method_id"/>
+                                    <field name="system_amount" readonly="1"/>
+                                    <field name="counted_amount"/>
+                                    <field name="counted" column_invisible="1"/>
+                                    <field name="difference" decoration-danger="difference &lt; 0"
+                                        decoration-success="difference &gt; 0"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_system"/>
+                                <field name="total_counted"/>
+                                <field name="total_difference" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="zee_daily_closing_action" model="ir.actions.act_window">
+        <field name="name">Daily Closings</field>
+        <field name="res_model">zee.daily.closing</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="zee_menu_daily_closing"
+        name="Daily Closings"
+        parent="point_of_sale.menu_point_rep"
+        action="zee_daily_closing_action"
+        sequence="20"/>
+
+    <!-- Employee advances -->
+    <record id="zee_employee_advance_view_list" model="ir.ui.view">
+        <field name="name">zee.employee.advance.list</field>
+        <field name="model">zee.employee.advance</field>
+        <field name="arch" type="xml">
+            <list string="Employee Advances">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="amount" sum="Total"/>
+                <field name="balance" sum="Total Balance"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="zee_employee_advance_view_form" model="ir.ui.view">
+        <field name="name">zee.employee.advance.form</field>
+        <field name="model">zee.employee.advance</field>
+        <field name="arch" type="xml">
+            <form string="Employee Advance">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                        invisible="state != 'draft'" groups="hr.group_hr_manager"/>
+                    <button name="action_pay" type="object" string="Pay Out" class="btn-primary"
+                        invisible="state != 'approved'" groups="account.group_account_invoice"/>
+                    <button name="action_register_repayment" type="object" string="Check Repaid"
+                        invisible="state != 'paid'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                        invisible="state not in ('draft', 'approved')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,paid,repaid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="date"/>
+                            <field name="amount"/>
+                            <field name="monthly_deduction"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="repaid_amount"/>
+                            <field name="balance"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Repayments" name="repayments">
+                            <field name="repayment_ids" readonly="state != 'paid'">
+                                <list editable="bottom">
+                                    <field name="date"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="zee_employee_advance_action" model="ir.actions.act_window">
+        <field name="name">Employee Advances</field>
+        <field name="res_model">zee.employee.advance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="zee_menu_employee_advance"
+        name="Employee Advances"
+        parent="hr.menu_hr_root"
+        action="zee_employee_advance_action"
+        groups="hr.group_hr_user"
+        sequence="30"/>
+</odoo>

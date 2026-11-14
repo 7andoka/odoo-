@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="sale_order_menu_reservations"
+        name="Reservations"
+        parent="sale.sale_order_menu"
+        action="sale_order_action_reservations"
+        groups="sales_team.group_sale_salesman"
+        sequence="30"/>
+
+    <menuitem id="zee_retail_menu_sellers"
+        name="Sellers"
+        parent="sale.sale_menu_root"
+        groups="sales_team.group_sale_manager"
+        sequence="45">
+        <menuitem id="zee_retail_menu_sellers_list"
+            name="Sellers"
+            action="hr_employee_action_sellers"
+            sequence="10"/>
+        <menuitem id="zee_retail_menu_seller_targets"
+            name="Distribute Targets"
+            action="zee_seller_target_action"
+            sequence="20"/>
+    </menuitem>
+</odoo>
