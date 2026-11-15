@@ -32,9 +32,11 @@ jobs:
 
       - name: Install zee_retail into a fresh Odoo database
         run: |
+          # The official Odoo image reads HOST/USER/PASSWORD from the environment
+          # and appends them after our arguments, so they must be set here.
           docker run --rm --network host \
+            -e HOST=localhost -e PORT=5432 \
+            -e USER=odoo -e PASSWORD=odoo \
             -v "$PWD/addons/zee_retail:/mnt/extra-addons/zee_retail:ro" \
             odoo:20.0 \
-            odoo -d zee_test -i zee_retail --stop-after-init \
-              --db_host=localhost --db_port=5432 \
-              --db_user=odoo --db_password=odoo
+            odoo -d zee_test -i zee_retail --stop-after-init
