@@ -3,11 +3,11 @@ from odoo.fields import Command
 from odoo.tests import tagged
 from odoo.tools.barcode import check_barcode_encoding
 
-from odoo.addons.base.tests.common import BaseCommon
+from .common import ZeeCommon
 
 
 @tagged('post_install', '-at_install')
-class TestProductCoding(BaseCommon):
+class TestProductCoding(ZeeCommon):
 
     @classmethod
     def setUpClass(cls):

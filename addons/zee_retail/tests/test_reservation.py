@@ -2,11 +2,11 @@ from odoo.exceptions import UserError
 from odoo.fields import Command
 from odoo.tests import tagged
 
-from odoo.addons.base.tests.common import BaseCommon
+from .common import ZeeCommon
 
 
 @tagged('post_install', '-at_install')
-class TestReservation(BaseCommon):
+class TestReservation(ZeeCommon):
 
     @classmethod
     def setUpClass(cls):

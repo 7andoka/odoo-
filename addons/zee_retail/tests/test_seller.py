@@ -3,11 +3,11 @@ from datetime import datetime
 from odoo.fields import Command
 from odoo.tests import tagged
 
-from odoo.addons.base.tests.common import BaseCommon
+from .common import ZeeCommon
 
 
 @tagged('post_install', '-at_install')
-class TestSeller(BaseCommon):
+class TestSeller(ZeeCommon):
 
     @classmethod
     def setUpClass(cls):

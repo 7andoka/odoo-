@@ -1,3 +1,4 @@
+from . import common
 from . import test_product_coding
 from . import test_reservation
 from . import test_return_voucher
