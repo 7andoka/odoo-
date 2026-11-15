@@ -15,7 +15,10 @@ def post_init_hook(env):
     PaymentMethod = env['pos.payment.method']
     for company in env['res.company'].search([]):
         company_env = env(context=dict(env.context, allowed_company_ids=company.ids))
-        outstanding = PaymentMethod.with_env(company_env)._get_default_outstanding_account(company)
+        # The helper that picks the default outstanding account is not present in every
+        # Odoo 20 build, so fall back to the company transfer account when it is missing.
+        helper = getattr(PaymentMethod.with_env(company_env), '_get_default_outstanding_account', None)
+        outstanding = helper(company) if helper else company.transfer_account_id
         for name, code in ZEE_PAYMENT_METHODS:
             if PaymentMethod.search_count([('name', '=', name), ('company_id', '=', company.id)]):
                 continue
