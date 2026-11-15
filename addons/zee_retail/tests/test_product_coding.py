@@ -18,15 +18,15 @@ class TestProductCoding(ZeeCommon):
         cls.color = cls.env['product.attribute'].create({
             'name': "Zee Color",
             'value_ids': [
-                Command.create({'name': "Black", 'zee_code': 'BL'}),
-                Command.create({'name': "White", 'zee_code': 'WH'}),
+                Command.create({'name': "Black", 'zee_code': '01'}),
+                Command.create({'name': "White", 'zee_code': '02'}),
             ],
         })
         cls.size = cls.env['product.attribute'].create({
             'name': "Zee Size",
             'value_ids': [
-                Command.create({'name': "M", 'zee_code': 'M'}),
-                Command.create({'name': "L", 'zee_code': 'L'}),
+                Command.create({'name': "M", 'zee_code': '2'}),
+                Command.create({'name': "L", 'zee_code': '3'}),
             ],
         })
 
@@ -61,8 +61,9 @@ class TestProductCoding(ZeeCommon):
         template = self._create_template()
         self.assertEqual(template.zee_base_code, 'TS070001')
         codes = set(template.product_variant_ids.mapped('default_code'))
+        # color on 2 digits, then the size code as is: 01 + 2 = 012
         self.assertEqual(codes, {
-            'TS070001-BLM', 'TS070001-BLL', 'TS070001-WHM', 'TS070001-WHL',
+            'TS070001-012', 'TS070001-013', 'TS070001-022', 'TS070001-023',
         })
 
     def test_serial_is_never_reused_and_is_per_merchant(self):
@@ -102,4 +103,5 @@ class TestProductCoding(ZeeCommon):
         self.assertFalse(product.zee_base_code)
         product.zee_merchant_id = self.merchant
         self.assertEqual(product.zee_base_code, 'TS070001')
-        self.assertEqual(product.product_variant_id.default_code, 'TS070001')
+        # no attribute: 011
+        self.assertEqual(product.product_variant_id.default_code, 'TS070001-011')
