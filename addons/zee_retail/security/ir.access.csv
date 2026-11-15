@@ -16,3 +16,5 @@ access_zee_employee_advance_hr_user,zee.employee.advance hr user,zee.employee.ad
 access_zee_employee_advance_repayment_hr_user,zee.employee.advance.repayment hr user,zee.employee.advance.repayment,hr.group_hr_user,crud,
 access_zee_employee_advance_hr_manager,zee.employee.advance hr manager,zee.employee.advance,hr.group_hr_manager,crud,
 access_zee_employee_advance_repayment_hr_manager,zee.employee.advance.repayment hr manager,zee.employee.advance.repayment,hr.group_hr_manager,crud,
+access_zee_reservation_deposit_sales,zee.reservation.deposit sales,zee.reservation.deposit,sales_team.group_sale_salesman,crud,
+access_zee_seller_target_sales_manager,zee.seller.target sales,zee.seller.target,sales_team.group_sale_manager,crud,

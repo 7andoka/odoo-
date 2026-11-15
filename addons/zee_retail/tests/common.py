@@ -8,6 +8,7 @@ class ZeeCommon(BaseCommon):
         'base.group_user',
         'sales_team.group_sale_manager',
         'stock.group_stock_manager',
+        'product.group_product_manager',
         'account.group_account_manager',
         'point_of_sale.group_pos_manager',
         'hr.group_hr_manager',

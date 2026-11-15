@@ -12,7 +12,7 @@ class TestSeller(ZeeCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.product = cls.env['product.product'].create({'name': "Sold item", 'list_price': 1000.0})
+        cls.product = cls.env['product.product'].create({'name': "Sold item", 'list_price': 1000.0, 'taxes_id': [Command.clear()]})
         cls.seller_user = cls.env['res.users'].create({
             'name': "Seller user",
             'login': 'zee_seller_user',

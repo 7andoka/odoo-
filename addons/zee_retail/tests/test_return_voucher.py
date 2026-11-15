@@ -12,7 +12,7 @@ class TestReturnVoucher(ZeeCommon):
     def setUpClass(cls):
         super().setUpClass()
         cls.env.user.group_ids |= cls.env.ref('sales_team.group_sale_manager')
-        cls.product = cls.env['product.product'].create({'name': "Returned item", 'list_price': 300.0})
+        cls.product = cls.env['product.product'].create({'name': "Returned item", 'list_price': 300.0, 'taxes_id': [Command.clear()]})
         cls.invoice = cls.env['account.move'].create({
             'move_type': 'out_invoice',
             'partner_id': cls.partner.id,
