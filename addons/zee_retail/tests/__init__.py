@@ -3,3 +3,4 @@ from . import test_reservation
 from . import test_return_voucher
 from . import test_seller
 from . import test_seller_target
+from . import test_purchase_and_operations

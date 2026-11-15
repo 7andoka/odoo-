@@ -40,3 +40,18 @@ jobs:
             -v "$PWD/addons/zee_retail:/mnt/extra-addons/zee_retail:ro" \
             odoo:20.0 \
             odoo -d zee_test -i zee_retail --stop-after-init
+
+      - name: Run the zee_retail tests
+        run: |
+          # Odoo does not always exit non-zero when a test fails, so the log is checked too.
+          docker run --rm --network host \
+            -e HOST=localhost -e PORT=5432 \
+            -e USER=odoo -e PASSWORD=odoo \
+            -v "$PWD/addons/zee_retail:/mnt/extra-addons/zee_retail:ro" \
+            odoo:20.0 \
+            odoo -d zee_test -u zee_retail --test-enable --test-tags /zee_retail \
+            --stop-after-init 2>&1 | tee test.log
+          if grep -E " (ERROR|FAIL) |tests failed" test.log; then
+            echo "zee_retail tests reported errors or failures"
+            exit 1
+          fi

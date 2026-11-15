@@ -15,6 +15,7 @@ running in the Zee-erp2 application and that Odoo does not cover natively.
         'account',
         'hr',
         'point_of_sale',
+        'purchase_stock',
         'pos_hr',
         'pos_loyalty',
         'sale_loyalty',
