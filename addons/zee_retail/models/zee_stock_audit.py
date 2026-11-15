@@ -52,6 +52,10 @@ class ZeeStockAudit(models.Model):
         tracking=True,
     )
     line_ids = fields.One2many(comodel_name='zee.stock.audit.line', inverse_name='audit_id', copy=False)
+    barcode_scan = fields.Char(
+        string="Scan Barcode",
+        help="Scan or type a barcode: each scan adds one unit to the counted quantity of that product.",
+    )
     line_count = fields.Integer(compute='_compute_line_count')
     difference_count = fields.Integer(
         string="Lines With Difference",
@@ -65,6 +69,35 @@ class ZeeStockAudit(models.Model):
             audit.difference_count = len(audit.line_ids.filtered(
                 lambda line: line.counted and not float_is_zero(line.difference_quantity, precision_digits=4)
             ))
+
+    @api.onchange('barcode_scan')
+    def _onchange_barcode_scan(self):
+        code = (self.barcode_scan or '').strip()
+        self.barcode_scan = False
+        if not code:
+            return
+        if self.state != 'counting':
+            return {'warning': {
+                'title': self.env._("Start the count first"),
+                'message': self.env._("Press Start Count before scanning products."),
+            }}
+        product = self.env['product.product'].search([('barcode', '=', code)], limit=1)
+        if not product:
+            return {'warning': {
+                'title': self.env._("Unknown barcode"),
+                'message': self.env._("No product has the barcode %s.", code),
+            }}
+        line = self.line_ids.filtered(lambda l: l.product_id == product)[:1]
+        if line:
+            line.counted = True
+            line.counted_quantity = (line.counted_quantity or 0.0) + 1
+        else:
+            self.line_ids = [fields.Command.create({
+                'product_id': product.id,
+                'expected_quantity': 0.0,
+                'counted': True,
+                'counted_quantity': 1.0,
+            })]
 
     @api.onchange('warehouse_id')
     def _onchange_warehouse_id(self):

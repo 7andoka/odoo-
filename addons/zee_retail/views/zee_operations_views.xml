@@ -44,6 +44,8 @@
                             <field name="user_id"/>
                             <field name="date"/>
                             <field name="difference_count"/>
+                            <field name="barcode_scan" placeholder="Scan a barcode..."
+                                invisible="state != 'counting'"/>
                         </group>
                     </group>
                     <notebook>

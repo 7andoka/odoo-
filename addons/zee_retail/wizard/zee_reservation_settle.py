@@ -53,7 +53,9 @@ class ZeeReservationSettle(models.TransientModel):
             invoice = order._create_invoices()[:1]
             invoice.action_post()
 
-        deposits = order.zee_payment_ids.filtered(lambda p: p.state in ('paid', 'in_process', 'reconciled'))
+        deposits = order.zee_payment_ids.filtered(
+            lambda p: p.payment_type == 'inbound' and p.state in ('paid', 'in_process', 'reconciled')
+        )
         self._zee_reconcile(invoice, deposits)
 
         if self.balance_amount > 0:

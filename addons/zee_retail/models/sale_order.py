@@ -42,8 +42,11 @@ class SaleOrder(models.Model):
     @api.depends('amount_total', 'zee_payment_ids.amount', 'zee_payment_ids.state')
     def _compute_zee_deposit(self):
         for order in self:
-            payments = order.zee_payment_ids.filtered(lambda p: p.state in ('paid', 'reconciled'))
-            order.zee_deposit_paid = sum(payments.mapped('amount'))
+            payments = order.zee_payment_ids.filtered(lambda p: p.state in ('paid', 'reconciled', 'in_process'))
+            # Deposits are received (inbound), refunds are paid back (outbound).
+            order.zee_deposit_paid = sum(
+                p.amount if p.payment_type == 'inbound' else -p.amount for p in payments
+            )
             order.zee_balance_due = order.amount_total - order.zee_deposit_paid
 
     def action_confirm(self):
@@ -55,6 +58,38 @@ class SaleOrder(models.Model):
                     name=order.name,
                 ))
         return super().action_confirm()
+
+    def action_cancel(self):
+        for order in self.filtered('zee_is_reservation'):
+            if any(p.state == 'done' for p in order.picking_ids):
+                raise UserError(self.env._(
+                    "Reservation %s was already delivered and cannot be cancelled.", order.name,
+                ))
+            order._zee_refund_deposits()
+        return super().action_cancel()
+
+    def _zee_refund_deposits(self):
+        """Pay back the deposits still held by the customer, in the journal they were paid in."""
+        self.ensure_one()
+        held = self.zee_deposit_paid
+        if held <= 0:
+            return
+        last_deposit = self.zee_payment_ids.filtered(
+            lambda p: p.payment_type == 'inbound' and p.state in ('paid', 'in_process', 'reconciled')
+        ).sorted('id')[-1:]
+        refund = self.env['account.payment'].create({
+            'payment_type': 'outbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_id.id,
+            'amount': held,
+            'currency_id': self.currency_id.id,
+            'journal_id': last_deposit.journal_id.id,
+            'date': fields.Date.context_today(self),
+            'memo': self.env._("Refund of the deposit of %s", self.name),
+            'zee_sale_order_id': self.id,
+        })
+        refund.action_post()
+        self.message_post(body=self.env._("Deposits of %(amount)s refunded on cancellation.", amount=held))
 
     def action_zee_register_deposit(self):
         self.ensure_one()
