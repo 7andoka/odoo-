@@ -112,7 +112,7 @@ class ZeeDailyClosingLine(models.Model):
     payment_method_id = fields.Many2one(comodel_name='pos.payment.method', string="Payment Method", required=True)
     system_amount = fields.Monetary(string="System", currency_field='currency_id', readonly=True)
     counted_amount = fields.Monetary(string="Counted", currency_field='currency_id')
-    counted = fields.Boolean(string="Counted", copy=False)
+    counted = fields.Boolean(string="Line Counted", copy=False)
     difference = fields.Monetary(
         compute='_compute_difference',
         store=True,

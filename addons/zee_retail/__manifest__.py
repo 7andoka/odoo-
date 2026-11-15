@@ -1,6 +1,7 @@
 {
     'name': 'Zee Retail',
     'version': '1.0',
+    'author': 'Zee',
     'category': 'Sales/Point of Sale',
     'summary': 'Retail operations of the Zee-erp2 application on top of Odoo',
     'description': """
