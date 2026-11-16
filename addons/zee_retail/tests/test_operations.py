@@ -25,7 +25,10 @@ class TestStockAudit(TransactionCase):
             quant.action_apply_inventory()
 
     def _audit(self):
-        return self.env['zee.stock.audit'].create({'warehouse_id': self.warehouse.id})
+        return self.env['zee.stock.audit'].create({
+            'warehouse_id': self.warehouse.id,
+            'location_id': self.warehouse.lot_stock_id.id,
+        })
 
     def test_start_takes_the_expected_quantities(self):
         audit = self._audit()
@@ -76,7 +79,10 @@ class TestDailyClosing(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.method = cls.env['pos.payment.method'].search([('type', '=', 'bank')], limit=1)
+        Method = cls.env['pos.payment.method'].with_context(active_test=False)
+        cls.method = Method.search([('type', '=', 'bank')], limit=1) or Method.create({
+            'name': "Zee test bank", 'type': 'bank',
+        })
 
     def test_totals_and_difference(self):
         closing = self.env['zee.daily.closing'].create({})
