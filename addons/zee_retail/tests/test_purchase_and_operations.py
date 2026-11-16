@@ -11,7 +11,7 @@ class TestPurchaseFlow(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.warehouse = cls.env['stock.warehouse'].search([('company_id', '=', cls.env.company.id)], limit=1)
-        cls.supplier = cls.env['res.partner'].create({'name': 'Zee Supplier', 'supplier_rank': 1})
+        cls.supplier = cls.env['res.partner'].create({'name': 'Zee Supplier', 'supplier_rank': 1, 'zee_merchant_code': '03'})
         cls.product = cls.env['product.product'].create({
             'name': 'Test shirt',
             'is_storable': True,
@@ -171,3 +171,15 @@ class TestPurchaseMerchantLink(TransactionCase):
         })
         order.button_confirm()
         self.assertEqual(product.zee_merchant_id, other)
+
+    def test_supplier_without_merchant_code_cannot_be_confirmed(self):
+        supplier = self.env['res.partner'].create({'name': 'No code supplier'})
+        product = self.env['product.template'].create({'name': 'Blocked', 'is_storable': True})
+        order = self.env['purchase.order'].create({
+            'partner_id': supplier.id,
+            'order_line': [Command.create({
+                'product_id': product.product_variant_id.id, 'product_qty': 1, 'price_unit': 5.0,
+            })],
+        })
+        with self.assertRaises(UserError):
+            order.button_confirm()
