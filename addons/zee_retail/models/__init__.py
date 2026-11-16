@@ -3,6 +3,7 @@ from . import account_payment
 from . import hr_employee
 from . import loyalty_card
 from . import pos_order
+from . import purchase_order
 from . import product_attribute_value
 from . import product_category
 from . import product_product

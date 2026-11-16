@@ -130,3 +130,44 @@ class TestEmployeeAdvance(TransactionCase):
         advance = self.env['zee.employee.advance'].create({'employee_id': self.employee.id, 'amount': 10})
         with self.assertRaises(UserError):
             advance.action_pay()
+
+
+@tagged('post_install', '-at_install', 'zee_retail')
+class TestPurchaseMerchantLink(TransactionCase):
+    """A product bought from a merchant takes that merchant, and its item code follows."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.merchant = cls.env['res.partner'].create({'name': 'Merchant Co', 'zee_merchant_code': '12'})
+        cls.category = cls.env['product.category'].create({'name': 'Jackets', 'zee_category_code': 'JK'})
+
+    def test_confirmed_purchase_sets_the_merchant_and_item_code(self):
+        product = self.env['product.template'].create({
+            'name': 'Jacket', 'categ_id': self.category.id, 'is_storable': True,
+        })
+        self.assertFalse(product.zee_base_code)
+        order = self.env['purchase.order'].create({
+            'partner_id': self.merchant.id,
+            'order_line': [Command.create({
+                'product_id': product.product_variant_id.id, 'product_qty': 1, 'price_unit': 50.0,
+            })],
+        })
+        order.button_confirm()
+        self.assertEqual(product.zee_merchant_id, self.merchant)
+        self.assertTrue(product.zee_base_code.startswith('JK12'))
+
+    def test_existing_merchant_is_kept(self):
+        other = self.env['res.partner'].create({'name': 'Other Co', 'zee_merchant_code': '13'})
+        product = self.env['product.template'].create({
+            'name': 'Kept jacket', 'categ_id': self.category.id, 'zee_merchant_id': other.id,
+            'is_storable': True,
+        })
+        order = self.env['purchase.order'].create({
+            'partner_id': self.merchant.id,
+            'order_line': [Command.create({
+                'product_id': product.product_variant_id.id, 'product_qty': 1, 'price_unit': 50.0,
+            })],
+        })
+        order.button_confirm()
+        self.assertEqual(product.zee_merchant_id, other)
