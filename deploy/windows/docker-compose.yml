@@ -1,0 +1,35 @@
+# Zee retail on Odoo 20, run locally with Docker Desktop.
+# Start with start-zee.bat, stop with stop-zee.bat. Data lives in the Docker volumes below.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - zee-db:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:20.0
+    restart: unless-stopped
+    depends_on:
+      - db
+    # The official image reads the database connection from these variables.
+    environment:
+      HOST: db
+      PORT: 5432
+      USER: odoo
+      PASSWORD: odoo
+      # Master password for the database manager. Change it before you use the system.
+      ADMIN_PASSWD: change-me-now
+    ports:
+      - "8069:8069"
+    volumes:
+      - zee-odoo:/var/lib/odoo
+      - ../../addons/zee_retail:/mnt/extra-addons/zee_retail:ro
+
+volumes:
+  zee-db:
+  zee-odoo:
